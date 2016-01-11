@@ -29,7 +29,7 @@ $(document).ready(function(){
 
 
 	// Initiate the worker and an auto receiver
-  w = new Worker("resources/js/worker.js").auto();
+  w = new Worker("js/worker.js").auto();
 	w.request("timedCount")
 
   // send some data to it
