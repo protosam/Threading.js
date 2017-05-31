@@ -1,57 +1,82 @@
-function send(func, payload){
-	data = {
-		function: func,
-		payload: payload
+var sendToFn = function(){
+	if(typeof(wid) !== 'undefined'){
+		anonMethodName = window[wid]["anonMethodName"];
 	}
-	jsdata = JSON.stringify(data)
-	this.postMessage(jsdata);
+
+	callback_details = JSON.stringify({ method: anonMethodName, args: Array.from(arguments) });
+
+	if(typeof(wid) !== 'undefined'){
+		window[wid].postMessage(callback_details);
+	}else{
+		postMessage(callback_details);
+	}
 	return this;
 }
 
+if(typeof(window) !== 'undefined' && typeof(Worker) !== "undefined" && typeof(Proxy) !== 'undefined') {
 
-function ajax(url, callback, data, type) {
-	var data_array, data_string, idx, req, value;
-	if (data == null) {
-		data = {};
-	}
-	if (callback == null) {
-		callback = function() {};
-	}
-	if (type == null) {
-		//default to a GET request
-		type = 'GET';
-	}
-	data_array = [];
-	for (idx in data) {
-		value = data[idx];
-		data_array.push("" + idx + "=" + value);
-	}
-	data_string = data_array.join("&");
-	req = new XMLHttpRequest();
-	req.open(type, url, false);
-	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	Worker.prototype = {};
+	Worker.prototype.anonMethodName = null;
+	
+	// Calls a function in our worker and passes a payload of data to the worker
+	Worker.prototype.sendToWorker = sendToFn;
 
-	req.onreadystatechange = function() {
-		if (req.readyState === 4 && req.status === 200) {
-			return callback(req.responseText);
+	// auto receiver that handles running a function and passes an object of data to it.
+	Worker.prototype.auto = function(func){
+		this.onmessage = function(event){
+			data = JSON.parse(event.data);
+			if(data.method in window && typeof(window[data.method]) == typeof(function(){})){
+				window[data.method].apply(this, data.args);
+			}
 		}
-	};
-	req.send(data_string);
 
-	return JSON.parse(req);
-}
-
-
-// the listener will automatically call functions by name
-self.addEventListener("message", function(event) {
-	// convert the payload to an object from it's JSON form
-	data = JSON.parse(event.data)
-
-	if (data.payload  === "undefined"){
-		// make a call to a function without a payload
-		self[data.function]()
-	}else{
-		// make the call to the function and give it a payload
-		self[data.function](data.payload)
+		return this;
 	}
-}, false);
+	
+	function sWorker(jsfile){
+		wid = "worker" + (new Date().getTime());
+		window[wid] = new Worker(jsfile).auto();
+		
+		return new Proxy({ id: wid }, {
+			get: function(target, name) {
+				window[wid]["anonMethodName"] = name;
+				
+				if (!(name in window[wid])) {
+					return window[wid]["sendToWorker"];
+				}
+				
+				return window[wid][name];
+			},
+			set: function(target, name, value) {
+				console.log("I'm sorry, I can not do that Dave.");
+				/*if (!(name in target)) {
+					console.log("Setting non-existant property '" + name + "', initial value: " + value);
+				}
+				target[name] = value;*/
+			}
+		});
+	}
+
+}else if(typeof(Worker) !== "undefined" && typeof(Proxy) !== 'undefined'){
+	var anonMethodName = null;
+	// the listener will automatically call functions by name
+	self.addEventListener("message", function(event) {
+		data = JSON.parse(event.data);
+		this[data.method].apply(this, data.args);
+	}, false);
+	var req = new Proxy({}, {
+		get: function(target, name) {
+			anonMethodName = name;
+			return sendToFn;
+		},
+		set: function(target, name, value) {
+			console.log("Not implemented");
+			/*
+			if (!(name in target)) {
+				console.log("Setting non-existant property '" + name + "', initial value: " + value);
+			}
+			target[name] = value;*/
+		}
+	});
+
+}
