@@ -1,10 +1,30 @@
 # JavascriptWorkerFramework
 Simple framework for my worker communications.
 
-#### The example
-Download the repo and open up example.html in your browser. You'll see that it's just a number counting up and that 100 was added to the number pretty quickly. What's happening is as follows:
-- Your web browser forks a separate process called a worker that has it's own thread.
-- The separate thread is setup to just count up every 0.5 seconds and tell the main thread (the web browser) what the new number is
-- The main thread tells the process to add 100 to the number
-- Then the separate thread tells the main process what the new number is, the main thread updates the html content of `<div id="hello">`  
-Hopefully this super simple example is useful for other people. The worker and the initiation script have some helper functions that make it a bit easier to just deal with worker communications. Everything is assumed to be an object when sent and received. JSON is automatically translated to objects with the helpers. Also, functions are just called atonomously by the worker and main process. 
+#### Workers have never been so easy
+The script that does the heavy lifting is `worker.functions.js`. You include it in your html like so:
+```
+<script src="js/worker.functions.js"></script>
+```
+You make a script that will talk to the worker and include that too. We'll use `sWorker` to initiate a worker thread using `background_worker.js`, like example.js in this repo:
+```
+w = new sWorker("js/background_worker.js.js");
+
+w.some_function_in_the_worker("some", "arguments", "here");
+
+function some_function_for_the_worker_to_call(){
+	console.log("Do something here...");
+}
+```
+Then you make a worker script that has functions to use in the background.
+```
+importScripts('worker.functions.js');
+
+function some_function_in_the_worker(arg1, arg2, arg3){
+	console.log("Arguments: ", arg1, arg2, arg3);
+	req.tothewalls();
+}
+
+```
+
+Then you're done. It's super simple and easy to use.
