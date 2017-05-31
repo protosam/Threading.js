@@ -1,16 +1,10 @@
 importScripts('worker.functions.js');
 
-var i = 0;
 
-function timedCount() {
-	i = i + 1;
-
-	payload = { message: i }
-	this.send("say", payload)
-
-	setTimeout("timedCount()",500);
-}
-
-function add(payload){
-	i += payload.amount
+// functions are just called magicly from your window level script
+// and will be called via the receiver in worker.functions.js
+function fromthewindows(message){
+	console.log(message);
+	console.log("FROM THE WINDOWS!");
+	req.tothewalls(); // this makes tothewalls() run in example.js
 }
