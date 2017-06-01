@@ -27,14 +27,14 @@
 			   You can declare variables and whatnot here. It is stripped out of it's 
 			   function and just slapped in after all the functions are added. */
 			main(){
-				console.log("This is the main scope of the Worker Thread...");
+				console.log("CLASS_TEST: This is the main scope of the Worker Thread...");
 			}
 
 			/* This is just going to become a function that you can use throughout 
 			   the rest of the code inside the Worker Thread */
 			a_function_in_a_thread(message){
-				console.log("Received message: " + message);
-				console.log("This message was just logged from inside the Worker Thread.");
+				console.log("CLASS_TEST: Received message: " + message);
+				console.log("CLASS_TEST: This message was just logged from inside the Worker Thread.");
 
 				/* request a callback to window.a_function_in_the_window()... window is not really window though */
 				window.a_function_in_the_window();
@@ -46,7 +46,7 @@
 		/* You can just declare functions inside the main thread (window) and they should just work
 		   inside the Worker Thread. */
 		function a_function_in_the_window(){
-			console.log("This message was just logged from the window.");
+			console.log("BOTH: This message was just logged from the window.");
 		}
 
 
@@ -56,7 +56,7 @@
 		mainW = new MainWorker();
 
 		/* Try out calling a method of your class that is now inside the Worker Thread. */
-		mainW.a_function_in_a_thread("Hey MainWorker()...");
+		mainW.a_function_in_a_thread("CLASS_TEST: Hey MainWorker()...");
 
 
 
@@ -77,13 +77,13 @@
 			   declare variables and whatnot here and they run in-line however
 			   you arrange them. Above all of this, the helper_functions will
 			   be added by Threading.js */
-			console.log("This is the main scope of the Worker Thread...");
+			console.log("ANON_FN_TEST: This is the main scope of the Worker Thread...");
 
 			/* make a function named a_function_in_a_thread() that can be used from the main thread (window).
 			   pretty much the same as in our class, but with FUNCTION jammed in front */
 			function a_function_in_a_thread(message){
-				console.log("Received message: " + message);
-				console.log("This message was just logged from inside the Worker Thread.");
+				console.log("ANON_FN_TEST: Received message: " + message);
+				console.log("ANON_FN_TEST: This message was just logged from inside the Worker Thread.");
 
 				/* request a callback to window.a_function_in_the_window()... window is not really window though */
 				window.a_function_in_the_window();
@@ -93,7 +93,7 @@
 		});
 
 		/* Try out calling a method of your function that is now inside the Worker Thread. */
-		mainW.a_function_in_a_thread("Hey Anonymous function(){}...");
+		anonW.a_function_in_a_thread("ANON_FN_TEST: Hey Anonymous function(){}...");
 	</script>
 </head>
 	<body>
