@@ -173,10 +173,11 @@ class Threading {
 		var methods = Object.getOwnPropertyNames(proto);
 		// begin building and storing code to turn into a blob.
 		var codeout = this.blobfixer("helper_functions");
+		
 		// iterates through every method in our class extension
 		methods.forEach(function(name, fn){
-			// ignores the constructor class of class extension.
-			if(name == 'constructor'){return;}
+			// ignores the constructor and main() functions of the class extension.
+			if(name == 'constructor' || name == 'main'){return;}
 			// temporary storage for code fixing.
 			var code = self[name].toString();
 			// so firefox auto-adds "function".. but chromium does not. wtf?.. check for it
@@ -187,6 +188,9 @@ class Threading {
 			// add the code to `codeout` variable
 			codeout += "\n" + code + "\n\n";
 		});
+		
+		// if we have a "main" function in the class, we want this to be the main scope.
+		if('main' in self){ codeout += "\n" + this.blobfixer("main"); }
 		
 		// blobify codeout and return the bloburl.
 		return this.blobify(codeout);
@@ -232,3 +236,6 @@ Worker.prototype.auto = function(func){
 	
 	return this;
 }
+
+
+
