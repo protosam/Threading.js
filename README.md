@@ -1,30 +1,48 @@
-# JavascriptWorkerFramework
-Simple framework for my worker communications.
+# Threading.js
+Class and Inline function based threading in Javascript. It utilizes Workers, Proxy, and JS6 Classes to provide a wonderful development experience to interact with Workers.
 
-#### Workers have never been so easy
-The script that does the heavy lifting is `worker.functions.js`. You include it in your html like so:
+#### Straight to the Point
+The script that does the heavy lifting is `threading.js`. You include it in your html like so:
 ```
-<script src="js/worker.functions.js"></script>
+<script src="js/threading.js"></script>
 ```
-You make a script that will talk to the worker and include that too. We'll use `sWorker` to initiate a worker thread using `background_worker.js`, like example.js in this repo:
-```
-w = new sWorker("js/background_worker.js.js");
+For an in-depth explanation for usage, check out example.html. Below we will simply cover two ways to use Threading.js.
 
-w.some_function_in_the_worker("some", "arguments", "here");
-
-function some_function_for_the_worker_to_call(){
-	console.log("Do something here...");
+#### Class Based Usage
+The class based workflow is designed to be clean, concise, and simple. To use Threading.js, you just have to extend the Threading class.
+```
+class WorkerNameHere extends Threading {
+	main(){
+		// the main scope of your worker here
+	}
+	somefunctionstoo(args, args1, args2){
+		// whatever functions you want
+	}
 }
 ```
-Then you make a worker script that has functions to use in the background.
+To use the worker, you would just do the following somewhere:
 ```
-importScripts('worker.functions.js');
+// This starts the thread
+somevar = new WorkerNameHere();
+// this calls somefunctionstoo() inside the worker thread.
+somevar.somefunctionstoo(val, val, val);
+```
+Pretty simple and it just works.
 
-function some_function_in_the_worker(arg1, arg2, arg3){
-	console.log("Arguments: ", arg1, arg2, arg3);
-	req.tothewalls();
-}
+#### Inline Function Based Usage
+To do the same thing we did in the class, we just do the following. However, it is not recommended to use Threading.js this way unless absolutely neccessary. It is not as clean to read through as the class method.
+```
+// This defines the worker code and builds the thread 
+somevar = new Threading(function(){
+	function somefunctionstoo(args, args1, args2){
+		// whatever functions you want
+	}
+	// main scope is wherever
+});
 
+// this calls somefunctionstoo() inside the worker thread.
+somevar.somefunctionstoo(val, val, val);
 ```
 
-Then you're done. It's super simple and easy to use.
+#### Final word
+You should also still have access in that example to things like `somevar.terminate();` with the way Threading.js was implemented. You can read up on the worker api here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
