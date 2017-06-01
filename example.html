@@ -4,11 +4,97 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Example</title>
+	<title>Threading Example</title>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-	<script src="js/worker.functions.js"></script>
-	<script src="js/background_worker.js"></script>
+	<script src="js/threading.js"></script>
+	<script type="text/javascript">
+		/* Below you will find a Class based example and an inline Function based example of Threading.js */
+		
+		/* Class based example of Threading.js
+		   -----------------------------------
+		   This model is probably easier to work with as classes are great for teams to design around
+		   Threading.js will package the functions of this class into a friendly manner.
+		   
+		   constructor() should not be used.
+		   main() will become code inside the primary scope of the Worker thread. This is mostly for variables
+		   everything else will will be individual functions
+		   
+		   Inside any worker class, you can call `window.function_name(args...)` and it will magically just
+		   callback to the main thread (window). Passing anonymous functions will not work. Passing arrays
+		   and JSON ready objects should work though. */
+		class MainWorker extends Threading {
+			/* This is stuff that will live inside the main scope of the Worker Thread
+			   You can declare variables and whatnot here. It is stripped out of it's 
+			   function and just slapped in after all the functions are added. */
+			main(){
+				console.log("This is the main scope of the Worker Thread...");
+			}
+
+			/* This is just going to become a function that you can use throughout 
+			   the rest of the code inside the Worker Thread */
+			a_function_in_a_thread(message){
+				console.log("Received message: " + message);
+				console.log("This message was just logged from inside the Worker Thread.");
+
+				/* request a callback to window.a_function_in_the_window()... window is not really window though */
+				window.a_function_in_the_window();
+			}
+		}
+
+
+
+		/* You can just declare functions inside the main thread (window) and they should just work
+		   inside the Worker Thread. */
+		function a_function_in_the_window(){
+			console.log("This message was just logged from the window.");
+		}
+
+
+
+		/* Using the MainWorker class defined above.
+		   First initialize your variable with the class extension that is using Threading. */
+		mainW = new MainWorker();
+
+		/* Try out calling a method of your class that is now inside the Worker Thread. */
+		mainW.a_function_in_a_thread("Hey MainWorker()...");
+
+
+
+		/* Functions Example of Threading.js
+		   ---------------------------------
+		   You can just do `X = new Threading(function_name);` and Threading will just shove it into
+		   a blob and consume it. In the example below, we're just passing an anonymous function to
+		   Threading.js and the helpers are automatically going to be added to it. Inside the function
+		   we pass to Threading.js we should be able to declare variables, more functions, and even
+		   classes to use. 
+		   
+		   Below we are going to just stuf things into an Anonymous function for our Worker Thread.
+		   Just bear in mind that this is probably not great if you want to work on a team with
+		   other people.
+		 */
+		anonW = new Threading(function(){
+			/* This will become the main scope of the Worker Thread. You can
+			   declare variables and whatnot here and they run in-line however
+			   you arrange them. Above all of this, the helper_functions will
+			   be added by Threading.js */
+			console.log("This is the main scope of the Worker Thread...");
+
+			/* make a function named a_function_in_a_thread() that can be used from the main thread (window).
+			   pretty much the same as in our class, but with FUNCTION jammed in front */
+			function a_function_in_a_thread(message){
+				console.log("Received message: " + message);
+				console.log("This message was just logged from inside the Worker Thread.");
+
+				/* request a callback to window.a_function_in_the_window()... window is not really window though */
+				window.a_function_in_the_window();
+			}
+
+			/* This is still the main scope here as well. */
+		});
+
+		/* Try out calling a method of your function that is now inside the Worker Thread. */
+		mainW.a_function_in_a_thread("Hey Anonymous function(){}...");
+	</script>
 </head>
 	<body>
 		You'll want to open your Browser console for this example.
