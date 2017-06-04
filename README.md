@@ -1,14 +1,9 @@
 # Threading.js
-Class and Inline function based threading in Javascript. It utilizes Workers, Proxy, and JS6 Classes to provide a wonderful development experience to interact with Workers.
-
-## Requires and Works In
-This requires `Proxy()`, `Workers()` and `classes` in javascript to work. It will not work for NodeJS and it will probably never be supported either since it already has so many Asynchronous features and doesn't need more function call learning curves.
-  
-For the proxy class, you call probably use this polyfill for supporting non-es6 browsers: https://github.com/GoogleChrome/proxy-polyfill  
+Class and Inline function based threading in Javascript. It utilizes Workers, Proxy, and Classes to provide a wonderful development experience to interact with Workers. Essentially made for ES6, but with a Polyfill for Proxy, can work for older versions of ES.  
   
-We have not tested it yet, but the Google guys tend to know what they're doing. Workers are not going to be possible to polyfill due to the way they work.  
+A good polyfill for `Proxy()` was made by the Google guys here: https://github.com/GoogleChrome/proxy-polyfill  
   
-Lastly, for classes, this was built for ES6, but there will be a backwards compatible version written soon. We can't really polyfill classes unfortunately.
+In regards to classes, a backwards compatible class will be built later. Right now Threading.js likes the ES6 spec, so we are following that. 
 
 ## Usage
 The script that does the heavy lifting is `threading.js`. You include it in your html like so:
