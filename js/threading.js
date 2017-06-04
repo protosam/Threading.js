@@ -111,7 +111,7 @@ class Threading {
 		/* "window" variable is defined inside our worker to allow anonymous function callback
 		   to the main thread. We use Proxy() for this witchcraft.
 		*/
-		var window = new Proxy({}, {
+		var root = new Proxy({}, {
 			// Used to handle anonymous function calling.
 			get: function(target, name) {
 				/* variable lives inside the Worker Thread's main scope. It is 
@@ -165,35 +165,63 @@ class Threading {
 	// Builds our code blob from an extended class. 
 	buildblob_from_class(){
 		// This allows us to actually see the class inside loops below... "this" wasn't useable in chromium.
-		var self = this;
+		var myself = this;
 		
 		// proto will contain a prototype of the class extension. We're not going too deep on this.
 		var proto = Object.getPrototypeOf(this);
 		// Extracting the method names from the class extension
 		var methods = Object.getOwnPropertyNames(proto);
+		
+		
+		// initialized string to store code.
+		var codeout = "";
+		
+		/* Extra Packages are available!!!! */
+		
+		// dompackage includes jquery and jsdom
+		if('helper_dompackage' in window){
+			// add the helper_dompackage to the worker
+			codeout += "\n"+this.blobfixer(window.helper_dompackage);
+			// inject Threading.setDOM() into the worker code. 
+			codeout += "\n"+this.buildFNinjector(this.setDOM);
+		}
+		
 		// begin building and storing code to turn into a blob.
-		var codeout = this.blobfixer("helper_functions");
+		codeout += "\n"+this.blobfixer("helper_functions");
 		
 		// iterates through every method in our class extension
 		methods.forEach(function(name, fn){
 			// ignores the constructor and main() functions of the class extension.
 			if(name == 'constructor' || name == 'main'){return;}
 			// temporary storage for code fixing.
-			var code = self[name].toString();
-			// so firefox auto-adds "function".. but chromium does not. wtf?.. check for it
-			if(code.match(/^function/g) == null){
-				// if we don't have "function" in front of our function declaration, put it there.
-				code = "function "+code;
-			}
 			// add the code to `codeout` variable
-			codeout += "\n" + code + "\n\n";
+			codeout += "\n" + myself.buildFNinjector(myself[name]) + "\n\n";
 		});
 		
 		// if we have a "main" function in the class, we want this to be the main scope.
-		if('main' in self){ codeout += "\n" + this.blobfixer("main"); }
+		if('main' in myself){ codeout += "\n" + this.blobfixer("main"); }
 		
 		// blobify codeout and return the bloburl.
 		return this.blobify(codeout);
+	}
+	
+	buildFNinjector(code){
+		var code = code.toString();
+		// so firefox auto-adds "function".. but chromium does not. wtf?.. check for it
+		if(code.match(/^function/g) == null){
+			// if we don't have "function" in front of our function declaration, put it there.
+			code = "function "+code;
+		}
+		return code;
+	}
+	
+	/* Package functions - Sometimes you just need more. */
+
+	// injects into worker with dompackage, with jsdom it generates a fake DOM, window, and includes jQuery.
+	setDOM(selector, html){
+		html=decodeURIComponent(html);
+		$(selector).html(html);
+		console.log($('body').html());
 	}
 }
 
