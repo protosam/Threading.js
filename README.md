@@ -4,7 +4,8 @@ Class and Inline function based threading in Javascript. It utilizes Workers, Pr
 ## Requires and Works In
 This requires `Proxy()`, `Workers()` and `classes` in javascript to work. It will not work for NodeJS and it will probably never be supported either since it already has so many Asynchronous features and doesn't need more function call learning curves.
   
-For the proxy class, you call probably use this polyfill for supporting non-es6 browsers: https://github.com/GoogleChrome/proxy-polyfill. 
+For the proxy class, you call probably use this polyfill for supporting non-es6 browsers: https://github.com/GoogleChrome/proxy-polyfill  
+  
 We have not tested it yet, but the Google guys tend to know what they're doing. Workers are not going to be possible to polyfill due to the way they work.
 ## Usage
 The script that does the heavy lifting is `threading.js`. You include it in your html like so:
