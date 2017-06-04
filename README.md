@@ -47,5 +47,39 @@ somevar = new Threading(function(){
 somevar.somefunctionstoo(val, val, val);
 ```
 
+### Want a DOM in your thread?
+Threading.js has some helpers. Right now they are expirimental, but they are functional. The first helper in progress is the `dompackage`. It includes a virtual DOM (JSDOM), jQuery, and a MutationObserver. Just add the following above your .js sources:
+
+```
+<script src="helpers/dompackage.min.js"></script>
+```
+At this time, we're writing a toolkit that will automatically update the main window DOM and visa-versa, but in the meantime you can use the mutation observer included in the DOM package:
+```
+console.log('JSDOM MUTATION TEST');
+var observer = new MutationObserver(function(mutations) {
+	    console.log('JSDOM DOM MUTATION OBSERVED.');
+	    console.log(mutations);
+});
+
+var observerConfig = {
+	childList: true,
+	attributes: true,
+	characterData: true,
+	subtree: true,
+	attributeOldValue: true,
+	characterDataOldValue: true
+}; 
+observer.observe(document.querySelector('html'), observerConfig);
+
+$('body').append('Hi there');
+$('body').append('<div>Hi there</div>');
+
+console.log('JSDOM MUTATION TEST');
+```
+If you're worried about MutationObserver support on the browser-side, go get this and just slap it into your site. It checks to see if `window.MutationObserver` exists and fallsback to the virtual MutationObserver.
+```
+https://github.com/megawac/MutationObserver.js/tree/master/dist
+```
+
 ## Final word
 You should also still have access in that example to things like `somevar.terminate();` with the way Threading.js was implemented. You can read up on the worker api here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
