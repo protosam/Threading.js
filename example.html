@@ -19,7 +19,7 @@
 		   main() will become code inside the primary scope of the Worker thread. This is mostly for variables
 		   everything else will will be individual functions
 		   
-		   Inside any worker class, you can call `window.function_name(args...)` and it will magically just
+		   Inside any worker class, you can call `root.function_name(args...)` and it will magically just
 		   callback to the main thread (window). Passing anonymous functions will not work. Passing arrays
 		   and JSON ready objects should work though. */
 		class MainWorker extends Threading {
@@ -36,8 +36,8 @@
 				console.log("CLASS_TEST: Received message: " + message);
 				console.log("CLASS_TEST: This message was just logged from inside the Worker Thread.");
 
-				/* request a callback to window.a_function_in_the_window()... window is not really window though */
-				window.a_function_in_the_window();
+				/* request a callback to a_function_in_the_window() in the main window */
+				root.a_function_in_the_window();
 			}
 		}
 
@@ -85,8 +85,8 @@
 				console.log("ANON_FN_TEST: Received message: " + message);
 				console.log("ANON_FN_TEST: This message was just logged from inside the Worker Thread.");
 
-				/* request a callback to window.a_function_in_the_window()... window is not really window though */
-				window.a_function_in_the_window();
+				/* request a callback to a_function_in_the_window() in the main window */
+				root.a_function_in_the_window();
 			}
 
 			/* This is still the main scope here as well. */
