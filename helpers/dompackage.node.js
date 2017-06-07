@@ -3,16 +3,17 @@
 Includes a virtual DOM (jsdom), jQuery, and a MutationObserver.
 
 To compile, run:
-./buildpackage.sh dompackage
+./build-dompackage.sh
  */
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { window } = new JSDOM(`<!DOCTYPE html>`);
-const $ = require('jquery')(window);
+const jQuery = require('jquery')(window);
 
-self["$"] = $;
+self["jQuery"] = jQuery;
 self["window"] = window;
 self["document"] = window.document;
 self["jsdom"] = jsdom;
 
-require("./mutationobserver");
+self["diffDOM"] = require("./dependency.diffDOM.js");
+
