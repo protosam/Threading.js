@@ -3,7 +3,7 @@ Class and Inline function based threading in Javascript. It utilizes Workers, Pr
   
 A good polyfill for `Proxy()` was made by the Google guys here: https://github.com/GoogleChrome/proxy-polyfill  
   
-In regards to classes, a backwards compatible class will be built later. Right now Threading.js likes the ES6 spec, so we are following that. 
+In regards to classes, a backwards compatible version that uses an older way to build a class will be built later. Right now we like the ES6 spec, so we are following that. 
 
 ## Usage
 The script that does the heavy lifting is `threading.js`. You include it in your html like so:
@@ -49,37 +49,29 @@ somevar.somefunctionstoo(val, val, val);
 ```
 
 ### Want a DOM in your thread?
-Threading.js has some helpers. Right now they are expirimental, but they are functional. The first helper in progress is the `dompackage`. It includes a virtual DOM (JSDOM), jQuery, and a MutationObserver. Just add the following above your .js sources:
+Threading.js has some helpers. Right now they are expirimental, but they are functional. The first helper in progress is the `dompackage`. It includes a virtual DOM (JSDOM), jQuery, and a DOM sync tool. Just add the following above your .js sources:
 
 ```
 <script src="helpers/dompackage.min.js"></script>
 ```
-At this time, we're writing a toolkit that will automatically update the main window DOM and visa-versa, but in the meantime you can use the mutation observer included in the DOM package:
+For jQuery, we didn't set `$`. You will need to either do `jQuery('selector').things...` or you can just do `$ = jQuery;` and begin working as per normal.  
+  
+The DOM package also supports syncing DOMs between the thread and window. To use this tool, you need to do some of the following.  
+  
+In the main thread, you can send changes for the entire html tag by doing the following:
 ```
-console.log('JSDOM MUTATION TEST');
-var observer = new MutationObserver(function(mutations) {
-	    console.log('JSDOM DOM MUTATION OBSERVED.');
-	    console.log(mutations);
-});
-
-var observerConfig = {
-	childList: true,
-	attributes: true,
-	characterData: true,
-	subtree: true,
-	attributeOldValue: true,
-	characterDataOldValue: true
-}; 
-observer.observe(document.querySelector('html'), observerConfig);
-
-$('body').append('Hi there');
-$('body').append('<div>Hi there</div>');
-
-console.log('JSDOM MUTATION TEST');
+syncDOM('html', 'worker_var_name_here'); // begin sending synchronizations to the worker thread for the selector 'html'
 ```
-If you're worried about MutationObserver support on the browser-side, go get this and just slap it into your site. It checks to see if `window.MutationObserver` exists and fallsback to the virtual MutationObserver.
+If you want to update the worker thread, to have the current HTML, you would do so as follows:
 ```
-https://github.com/megawac/MutationObserver.js/tree/master/dist
+html = JSON.stringify(document.querySelector('html').outerHTML); // cleanly escape html.
+mainW.setDOM('html', html);
+```
+In the worker, thread, we also need to let it know to send things back to the window thread. From the thread, we make requests to the window with `root`, so we have to pass a string named `"root"`.
+```
+syncDOM('html', 'root'); // we could do this inside the worker
+// OR!!!
+worker_var_name_here.syncDOM('html', 'root'); // we could do this right under the main window setup.
 ```
 
 ## Final word
