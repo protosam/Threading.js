@@ -179,11 +179,9 @@ class Threading {
 		/* Extra Packages are available!!!! */
 		
 		// dompackage includes jquery and jsdom
-		if('helper_dompackage' in window){
+		for(var i=0; i<self.threadingjs.helpers.length; i++){
 			// add the helper_dompackage to the worker
-			codeout += "\n"+this.blobfixer(window.helper_dompackage);
-			// inject Threading.setDOM() into the worker code. 
-			codeout += "\n"+this.buildFNinjector(this.setDOM);
+			codeout += "\n"+this.blobfixer(self.threadingjs.helpers[i]);
 		}
 		
 		// begin building and storing code to turn into a blob.
@@ -214,17 +212,10 @@ class Threading {
 		}
 		return code;
 	}
-	
-	/* Package functions - Sometimes you just need more. */
-
-	// injects into worker with dompackage, with jsdom it generates a fake DOM, window, and includes jQuery.
-	setDOM(selector, html){
-		html=decodeURIComponent(html);
-		$(selector).html(html);
-		console.log($('body').html());
-	}
 }
 
+self.threadingjs = {};
+self.threadingjs.helpers = [];
 
 // The worker needs some utility stuff to function properly in Threading.js
 Worker.prototype = {};
@@ -264,6 +255,7 @@ Worker.prototype.auto = function(func){
 	
 	return this;
 }
+
 
 
 
