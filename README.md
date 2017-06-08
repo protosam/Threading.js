@@ -21,4 +21,4 @@ A good polyfill for `Proxy()` was made by the Google guys here: https://github.c
 In regards backwards compatability with classes, using Google Closure should backport classes to the older method of function based classes.
 
 ## Troubleshooting and Testing
-We recommend testing in the Chromium browser, as it is one of the most strict of the lot. Threading.js creates URL objects from blobs of code. When errors occur, you will see references like `blob:null/91ae193a-306f-40b6-8341-52914d13ac35:5` which is referring to line 5 of some blobified code. Just click it from the Javascript condsole to see the actual snippet of relevant code.
+We recommend testing in the Chromium browser, as it is one of the most strict of the lot. Threading.js creates URL objects from blobs of code. When errors occur, you will see references like `blob:null/91ae193a-306f-40b6-8341-52914d13ac35:5` which is referring to line 5 of some blobified code. Just click it from the Javascript console to see the actual snippet of relevant code.
