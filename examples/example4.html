@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Example</title>
+	<script src="../htmlres/jquery-3.2.1.min.js"></script>
+	<script src="../js/threading.cs.js"></script>
+	<script src="../helpers/dompackage.min.js"></script>
+
+	<script>
+	/* The dompackage example of Threading.js
+	   -----------------------------------
+	   The dompackage is a helper that loads a Virtual DOM into the worker thread and
+	   also jQuery.
+	*/
+	
+	class MainWorker extends Threading {
+	}
+	
+	mainW = new MainWorker();
+	
+	/* These will setup the sync process for us. First we will discuss:
+	   syncDOM(selector, slave_thread_variable_name)
+	   
+	   selector @string
+	       It is recommended to use an absolute selector like 'body', 'html', or '#some_id'
+	       When updates are seen to the selected element, a diff will be sent to slave threads
+	       
+	   slave_thread_variable_name @string
+	       Set this string to be the name of the variable that is being used to post messages
+	       back and forth between threads. Inside a Threading.js worker thread, you set this
+	       to 'root'. Otherwise you set it to whatever the variable is that initiated the
+	       Threading.js class.
+	       
+	   */
+	
+	
+	
+	// natural $(document).ready(function(){});
+	document.addEventListener("DOMContentLoaded", function() {
+		/* Let this window know to sync the mainW thread when changes to the DOM are mad. */
+		syncDOM('html', 'mainW');
+	
+		/* So... `syncDOM('html', 'root')` can be ran in the thread, but it's easier to just
+		   do this in the same place we initiate the sync. */
+		mainW.syncDOM('html', 'root');
+	
+		/* We use document.querySelector to get the current document html content. Run in through
+		   JSON.stringify() to ensure we get all the content in there. */
+		escaped_html_string = JSON.stringify(document.querySelector('html').innerHTML);
+	
+		// setDOM(selector, escaped_html_string) will prompt an update without triggering the sync.
+		mainW.setDOM('html', escaped_html_string);
+		
+		
+		// Lets make a change now..
+		document.querySelector('body').innerHTML += "<p>Hello there world.</p>";
+		
+		// did the changes make it to the thread?
+		console.log('Added \\n<p>Hello there world.</p> to the main window DOM.');
+		console.log('did the changes make it to the thread?');
+		
+		// we can just eval code to give us an answer, but we need to wait a sec. Updates can take up to 35 milliseconds
+		setTimeout(function(){
+			// super lazy eval in the worker thread...
+			mainW.eval('console.log(document.querySelector("html").innerHTML);');
+		}, 1000);
+		
+	});
+	</script>
+
+</head>
+<body>
+	<p>To see the output of this example, open your browser's javascript console.</p>
+	<p>In this example, we setup a Virtual DOM inside of a thread using the worker thread. <strong>NOTE: The charset has to be declared in a meta tag to UTF-8 if you use our min.js!</strong></p>
+</body>
+</html>

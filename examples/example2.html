@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Example</title>
+	<script src="../js/threading.cs.js"></script>
+	<script src="../helpers/dompackage.min.js"></script>
+
+	<script>
+	/* Functions Example of Threading.js
+	   ---------------------------------
+	   You can just do `X = new Threading(function_name);` and Threading will just shove it into
+	   a blob and consume it. In the example below, we're just passing an anonymous function to
+	   Threading.js and the helpers are automatically going to be added to it. Inside the function
+	   we pass to Threading.js we should be able to declare variables, more functions, and even
+	   classes to use. 
+	   
+	   Below we are going to just stuf things into an Anonymous function for our Worker Thread.
+	   Just bear in mind that this is probably not great if you want to work on a team with
+	   other people.
+	 */
+	anonW = new Threading(function(){
+		/* This will become the main scope of the Worker Thread. You can
+		   declare variables and whatnot here and they run in-line however
+		   you arrange them. Above all of this, the helper_functions will
+		   be added by Threading.js */
+		console.log("This is the main scope of the Worker Thread...");
+
+		/* make a function named a_function_in_a_thread() that can be used from the main thread (window).
+		   pretty much the same as in our class, but with FUNCTION jammed in front */
+		function a_function_in_a_thread(message){
+			console.log("Received message: " + message);
+			console.log("This message was just logged from inside the Worker Thread.");
+
+			/* request a callback to window.a_function_in_the_window()... window is not really window though */
+			root.a_function_in_the_window();
+		}
+
+		/* This is still the main scope here as well. */
+	});
+
+	/* Try out calling a method of your function that is now inside the Worker Thread. */
+	anonW.a_function_in_a_thread("Hey Anonymous function(){}...");
+
+	</script>
+
+</head>
+<body>
+	<p>To see the output of this example, open your browser's javascript console.</p>
+	<p>In this example, create a worker from an anonymous function. Pretty straight forward.</p>
+</body>
+</html>

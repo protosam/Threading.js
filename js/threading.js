@@ -1,4 +1,6 @@
-// Threading class.
+/* Threading.js
+   For some backwards compatability, use the Google Closure compiler.
+   closure --compilation_level WHITESPACE_ONLY --js threading.js --js_output_file threading.cs.js */
 class Threading {
 	constructor(makename) { // load in unchecked object
 		/* initializing failreason as null.

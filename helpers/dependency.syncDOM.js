@@ -1,4 +1,3 @@
-
 self["syncDOM"] = function(selector, slavenode){
 	self["dom_diff_watcher"] = {
 		dd: new diffDOM(),
@@ -27,7 +26,6 @@ self["setDOM"] = function(selector, contents){
 }
 
 self["syncDOMUpdates"] = function(selector, diff){
-	console.log(JSON.stringify(diff));
 	if(!("dom_diff_watcher" in self)){
 		syncDOM(selector);
 	}

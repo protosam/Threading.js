@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Example</title>
+	<script src="../js/threading.cs.js"></script>
+
+	<script>
+	/* Class based example of Threading.js
+	   -----------------------------------
+	   This model is probably easier to work with as classes are great for teams to design around
+	   Threading.js will package the functions of this class into a friendly manner.
+	   
+	   constructor() should not be used.
+	   main() will become code inside the primary scope of the Worker thread. This is mostly for variables
+	   everything else will will be individual functions
+	   
+	   Inside any worker class, you can call `window.function_name(args...)` and it will magically just
+	   callback to the main thread (window). Passing anonymous functions will not work. Passing arrays
+	   and JSON ready objects should work though. */
+	class MainWorker extends Threading {
+		/* This is stuff that will live inside the main scope of the Worker Thread
+		   You can declare variables and whatnot here. It is stripped out of it's 
+		   function and just slapped in after all the functions are added. */
+		main(){
+			console.log("Main scope of the worker thread.");
+		}
+
+		/* This is just going to become a function that you can use throughout 
+		   the rest of the code inside the Worker Thread */
+		a_function_in_a_thread(message){
+			console.log("Received message: " + message);
+			console.log("This message was just logged from inside the Worker Thread.");
+			/* request a callback to window.a_function_in_the_window()... window is not really window though */
+			root.a_function_in_the_window();
+		
+		}
+	
+		updatestesting(){
+			console.log('Running update test.');
+			jQuery('body').append('hello world');
+		}
+	}
+
+
+	/* You can just declare functions inside the main thread (window) and they should just work
+	   inside the Worker Thread. */
+	function a_function_in_the_window(){
+		console.log("This message was just logged from the window.");
+	}
+	
+	
+	/* Using the MainWorker class defined above.
+	   First initialize your variable with the class extension that is using Threading. */
+	mainW = new MainWorker();
+	
+	
+	/* Try out calling a method of your class that is now inside the Worker Thread. */
+	mainW.a_function_in_a_thread("Hey MainWorker()...");
+	</script>
+
+</head>
+<body>
+	<p>To see the output of this example, open your browser's javascript console.</p>
+	<p>In this example, we use ES6 classes to extend the Threading class and define the functions and main scope of the thread. For this method, we recommend using the Google Closure compiler to ensure backwards compatibility.</p>
+</body>
+</html>
